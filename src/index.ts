@@ -4,30 +4,7 @@
 import net from 'net';
 
 // Создаем сервер
-const server = net.createServer();
-
-/**
- * Ассинхронно получает из объекта server
- * текущее количество активных подключений
- * @param server
- * @returns
- */
-async function getCurrentConections(server: net.Server): Promise<number> {
-  return new Promise((resolve) => {
-    server.getConnections((e, c) => {
-      if (e) {
-        console.error('[SERVER] Error get count of connections', e);
-      }
-      resolve(c);
-    });
-  });
-}
-
-/**
- * Обработчик сервера
- * срабатывает при новом подключении
- */
-server.on('connection', async (con) => {
+const server = net.createServer(async (con) => {
   // Подключенному клиенту шлет сообщение
   const arr = new Uint8Array(2);
   arr.fill(0x69, 0);
@@ -67,6 +44,23 @@ server.on('connection', async (con) => {
     console.log('[SERVER] End conection');
   });
 });
+
+/**
+ * Ассинхронно получает из объекта server
+ * текущее количество активных подключений
+ * @param server
+ * @returns
+ */
+async function getCurrentConections(server: net.Server): Promise<number> {
+  return new Promise((resolve) => {
+    server.getConnections((e, c) => {
+      if (e) {
+        console.error('[SERVER] Error get count of connections', e);
+      }
+      resolve(c);
+    });
+  });
+}
 
 const PORT = 25000;
 

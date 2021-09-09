@@ -1,5 +1,5 @@
 {
-  "name": "net",
+  "name": "net-example",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
@@ -7,12 +7,16 @@
     "ts": "tsc -p . -w",
     "build": "tsc -p .",
     "dev": "nodemon ${npm_package_main}",
-    "start": "node ${npm_package_main}"
+    "start": "node ${npm_package_main}",
+    "client": "node dist/client.js"
   },
   "devDependencies": {
-    "@types/node": "^16.7.13"
-  },
-  "dependencies": {
-    "cors": "^2.8.5"
+    "@types/node": "^16.7.13",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2"
   }
 }

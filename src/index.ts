@@ -1,56 +1,75 @@
+/**
+ * Файл содержаший логику сервера
+ */
 import net from 'net';
 
-let data: Buffer;
-
+// Создаем сервер
 const server = net.createServer();
-server.on('connection', (con) => {
-  console.log('Contected', )
-  const arr = new Uint8Array(2);
-  arr.fill(0xC8, 0)
-  arr.fill(0x0D, 1)
-  con.write(arr)
-  server.getConnections((e, c) => {
-    console.log(1, e, c)
-  })
-  con.setEncoding('utf-8');
-  con.on('connect', () => {
-    console.log('connect')
-  });
-  con.on('data', (d) => {
-    console.log('data', d)
-    data = d;
-  });
-  con.on('message', () => {
-    console.log('message')
-  });
-  con.on('error', (d) => {
-    console.log('error', d)
-  });
-  con.on('close', (e) => {
-    console.log('close', e)
+
+/**
+ * Ассинхронно получает из объекта server
+ * текущее количество активных подключений
+ * @param server
+ * @returns
+ */
+async function getCurrentConections(server: net.Server): Promise<number> {
+  return new Promise((resolve) => {
     server.getConnections((e, c) => {
-      console.log(1, e, c)
-    })
+      if (e) {
+        console.error('[SERVER] Error get count of connections', e);
+      }
+      resolve(c);
+    });
   });
+}
+
+/**
+ * Обработчик сервера
+ * срабатывает при новом подключении
+ */
+server.on('connection', async (con) => {
+  // Подключенному клиенту шлет сообщение
+  const arr = new Uint8Array(2);
+  arr.fill(0x69, 0);
+  arr.fill(0x0d, 1);
+  con.write(arr);
+  // Получает количество активных соединений и выводит в консоль
+  const conns = await getCurrentConections(server);
+  console.info('[SERVER] Client connected. Count of active connections: ', conns);
+  /**
+   * Обработчик соединения при получении данных
+   */
+  con.on('data', (d) => {
+    console.log('[SERVER] Receiving data: ', d);
+  });
+  /**
+   * Обработчик соединения
+   * при ошибке
+   */
+  con.on('error', (d) => {
+    console.error('[SERVER] Error connection', d);
+  });
+  /**
+   * Обработчик соединения при закрытии
+   */
+  con.on('close', (e) => {
+    server.getConnections((e, c) => {
+      if (e) {
+        console.error('[SERVER] connection closed with error: ', e);
+      }
+      console.info('[SERVER] Client disconnected. Count of active conections: ', c);
+    });
+  });
+  /**
+   * Обработчик соединения при окончании работы с данным клиентом
+   */
   con.on('end', () => {
-    console.log('end')
+    console.log('[SERVER] End conection');
   });
-})
-
-
-server.listen(25000, '127.0.0.1');
-
-const client = new net.Socket({  });
-client.connect(25000, '127.0.0.1', () => {
-	client.write('test');
 });
 
-client.on('data', (data) => {
-  client.write('dasda')
-	console.log(String.fromCharCode(data[0]), String.fromCharCode(data[1]))
-	client.destroy();
-});
+const PORT = 25000;
 
-client.on('close', function() {
-	console.log('Connection closed');
+server.listen(PORT, '127.0.0.1', () => {
+  console.info(`Server started on wss://localhost:${PORT}`);
 });

@@ -65,5 +65,5 @@ async function getCurrentConections(server: net.Server): Promise<number> {
 const PORT = 25000;
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.info(`Server started on wss://localhost:${PORT}`);
+  console.info(`Running socket server on port: ${PORT}`);
 });
